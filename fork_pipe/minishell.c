@@ -2,6 +2,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <sys/types.h>
+#include <stdlib.h>
 
 int error(char* errmsg)
 {
@@ -11,8 +12,7 @@ int error(char* errmsg)
 
 int main()
 {
-	int fd[2], nbytes_read, nbytes_write, buff_size;
-	int status;
+	int fd[2], stdin_sv, stdout_sv;
 	pid_t chpid;
 
 
@@ -27,9 +27,20 @@ int main()
 	}
 	if(chpid == 0)
 	{
-	
+		close(fd[1]);
+		stdin_sv = dup(STDIN_FILENO);
+		dup2(fd[0], STDIN_FILENO);
+		system("sort");	
+		dup2(stdin_sv, STDIN_FILENO);
 	}
 	else
 	{
+		close(fd[0]);
+		stdout_sv = dup(STDOUT_FILENO);
+		dup2(fd[1], STDOUT_FILENO);
+		system("ls");
+		dup2(stdout_sv, STDOUT_FILENO);
 	}
+
+	return 0;
 }
