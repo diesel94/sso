@@ -12,10 +12,11 @@ int error(char* errmsg)
 
 int main()
 {
-	int fd[2], nbytes_read, nbytes_write, buff_size;
+	int fd[2], i;
+	size_t nbytes_read, nbytes_write, buff_size;
 	int status;
 	pid_t chpid;
-	char msg[] = "Hello!";
+	char msg[] = "H";
 	char msgbuff[80];
 	
 	if(pipe(fd) == -1)
@@ -49,12 +50,12 @@ int main()
 	{
 		close(fd[0]);
 		printf("[parent] start sending msgs...\n");
-		while(1)
+		for(i=0; i<10000; i++)
 		{
-			if((nbytes_write = write(fd[1], &msg, (strlen(msg) + 1)) > 0))
-			{
-				buff_size += nbytes_write;	
-				printf("%d\n", buff_size);
+			if(nbytes_write = write(fd[1], &msg, (strlen(msg) + 1) > 0))
+			{	
+				buff_size += nbytes_write;
+				printf("bytes: %d\n", buff_size);
 			}
 			else
 			{
