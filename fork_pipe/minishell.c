@@ -10,11 +10,15 @@ int error(char* errmsg)
 	return 1;
 }
 
-int main()
+int main(int argc, char** argv)
 {
 	int fd[2], stdin_sv, stdout_sv;
 	pid_t chpid;
 
+	if(argc != 3)
+	{
+		return error("required 2 parameters\n");
+	}
 
 	if(pipe(fd) == -1)
 	{
@@ -30,7 +34,7 @@ int main()
 		close(fd[1]);
 		stdin_sv = dup(STDIN_FILENO);
 		dup2(fd[0], STDIN_FILENO);
-		system("sort");	
+		system(argv[2]);
 		dup2(stdin_sv, STDIN_FILENO);
 	}
 	else
@@ -38,7 +42,7 @@ int main()
 		close(fd[0]);
 		stdout_sv = dup(STDOUT_FILENO);
 		dup2(fd[1], STDOUT_FILENO);
-		system("ls");
+		system(argv[1]);
 		dup2(stdout_sv, STDOUT_FILENO);
 	}
 
