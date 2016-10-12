@@ -2,6 +2,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <sys/types.h>
+#include <sys/wait.h>
 #include <stdlib.h>
 
 int error(char* errmsg)
@@ -12,7 +13,7 @@ int error(char* errmsg)
 
 int main(int argc, char** argv)
 {
-	int fd[2], stdin_sv, stdout_sv;
+	int fd[2];
 	pid_t chpid;
 
 	if(argc != 3)
@@ -31,20 +32,16 @@ int main(int argc, char** argv)
 	}
 	if(chpid == 0)
 	{
-		close(fd[1]);
-		stdin_sv = dup(STDIN_FILENO);
-		dup2(fd[0], STDIN_FILENO);
-		system(argv[2]);
-		dup2(stdin_sv, STDIN_FILENO);
+		close(fd[0]);
+		dup2(fd[1], STDOUT_FILENO);
+		execl("/bin/bash", "bash", "-c", argv[1]);
 	}
 	else
 	{
-		close(fd[0]);
-		stdout_sv = dup(STDOUT_FILENO);
-		dup2(fd[1], STDOUT_FILENO);
-		system(argv[1]);
-		dup2(stdout_sv, STDOUT_FILENO);
+		close(fd[1]);
+		dup2(fd[0], STDIN_FILENO);
+		execl("/bin/bash", "bash", "-c", argv[2]);
 	}
-
+	wait(NULL);
 	return 0;
 }
