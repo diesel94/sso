@@ -26,9 +26,6 @@ char* get_command(int key)
 		case 112:
 		return "pause\n";
 
-		case 114:
-		return "resume\n";
-
 		default:
 		return "";
 	}
@@ -37,11 +34,15 @@ char* get_command(int key)
 int main()
 {
 	const char* node_path = "/tmp/node";
-	char* command;
 	char key = 0;
 	int node_fh;
 
+	if(mkfifo(node_path, 0666) == -1)
+	{
+		return error("mknod faild");
+	}
 	node_fh = open(node_path, O_RDWR);
+
 	if(node_fh == -1)
 	{
 		return error("node file open failed");
@@ -52,8 +53,8 @@ int main()
 	do
 	{
 		key = getchar();
-		command = get_command(key);
-		write(node_fh, command, (sizeof(command)));
+		char* command = get_command(key);
+		write(node_fh, command, (strlen(command)));
 		printf("[%s] ", command);
 	}
 	while(key != 113);
@@ -61,6 +62,7 @@ int main()
 	system("stty cooked");
 
 	close(node_fh);
+	unlink(node_path);
 	return 0;
 }
 
