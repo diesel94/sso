@@ -16,7 +16,7 @@ int error(char* errmsg)
 int main()
 {
 	const char* node_path = "/tmp/node";
-	const char* msg = "test\n";	
+	const char* msg = "hello";
 	int node_fh, i, write_bytes;
 
 	node_fh = open(node_path, O_RDWR);
@@ -24,17 +24,17 @@ int main()
 	{
 		return error("node file open failed");
 	}
-	
+
 	sleep(5);
 
 	for(i=0; i<10; i++)
 	{
-		write_bytes = write(node_fh, &msg, sizeof(msg));
+		write_bytes = write(node_fh, msg, strlen(msg));
 		printf("[write %i bytes: %i] %s \n", i, write_bytes, msg);
 		sleep(1);
 	}
-	
+
 	close(node_fh);
-	return 0;	
+	return 0;
 }
 
