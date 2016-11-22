@@ -1,43 +1,53 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <unistd.h>
 #include <pthread.h>
 #include <semaphore.h>
 
-#define PHILOSOPHERS_NUM 3
+#define PHILOSOPHERS_NUM 5
 #define PHILOSOPHERS_EATING_TIME 5
 #define PHILOSOPHERS_THINKIG_TIME 2
 
 sem_t forks_sem;
 sem_t waiter_sem;
+char* philosophers_status[PHILOSOPHERS_NUM];
 
 void philosopher_func(void* arg)
 {
 	int id = (int)arg;
-	printf("philosopher[%d]: start\n", id);
+	philosophers_status[id] = "START";
 
 	while(1)
 	{
-		printf("philosopher[%d]: try enter\n", id);
+		philosophers_status[id] = "TRY ENTER";
 		sem_wait(&waiter_sem);
 
-		//philosopher in room
-		printf("philosopher[%d]: waiting for FIRST fork\n", id);
-		sem_wait(&forks_sem);
-		printf("philosopher[%d]: waiting for SECOND fork\n", id);
+		philosophers_status[id] = "WAIT FIRST FORK";
 		sem_wait(&forks_sem);
 
-		printf("philosopher[%d]: eating\n", id);
+		philosophers_status[id] = "WAIT SECOND FORK";
+		sem_wait(&forks_sem);
+
+		philosophers_status[id] = "EAT";
 		sleep(PHILOSOPHERS_EATING_TIME);
 
 		sem_post(&forks_sem);
 		sem_post(&forks_sem);
-		//philosopher in room
 
-		printf("philosopher[%d]: exit\n", id);
+		philosophers_status[id] = "EXIT";
 		sem_post(&waiter_sem);
 
-		printf("philosopher[%d]: thinking\n", id);
+		philosophers_status[id] = "THINK";
 		sleep(PHILOSOPHERS_THINKIG_TIME);
+	}
+}
+
+void update_table()
+{
+	system("clear");
+	for(int i=0; i<PHILOSOPHERS_NUM; i++)
+	{
+		printf("[%d]: %s\n", i, philosophers_status[i]);
 	}
 }
 
@@ -62,10 +72,8 @@ int main()
 
 	while(1)
 	{
-		if(getchar() == 113) //113 is 'q' ASCII value
-		{
-			break;
-		}
+		sleep(1);
+		update_table();
 	}
 
 	return 0;
