@@ -16,6 +16,7 @@ char* philosophers_status[PHILOSOPHERS_NUM];
 
 void philosopher_func(void* arg)
 {
+	printf("func\n");
 	int id = (int)arg;
 	philosophers_status[id] = "START";
 
