@@ -12,12 +12,11 @@ void conn_func(void* arg)
     
      while(1)
      {
-        if(feof(connsockfd))
-        {
-            break;
-        }
-
         n = read(connsockfd,buffer,255);
+        if(n == 0)
+        {
+            printf("EOF closing connection\n");
+        }
         if(n < 0)
         {
             printf("ERROR reading from socket");
